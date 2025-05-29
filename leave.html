@@ -97,7 +97,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzT8opiinjMXtXyMFtnexg8ZWXFBqgnEh6hJckEBf4m4zui5NGQcnPdfoaT6qIjU78I/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwT_S7ffcsEwv4EeKk0ZLYKgUoHmOuM77Q7l9I8C4XK11wiehRgdQAmRM3jdCP8dX5D/exec";
 
     function checkLogin() {
       const role = sessionStorage.getItem("userRole");
@@ -174,7 +174,7 @@ function login() {
   const pass = document.getElementById("password").value.trim();
   const error = document.getElementById("loginError");
 
-  fetch(`https://script.google.com/macros/s/AKfycbwSgfimBu2L7JMKXnxnNmqkqcncT4szf9saXas1j_wHHI4OSMLlvvGdAEBgu7rgX7bF/exec?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)
+  fetch(`https://script.google.com/macros/s/AKfycbwT_S7ffcsEwv4EeKk0ZLYKgUoHmOuM77Q7l9I8C4XK11wiehRgdQAmRM3jdCP8dX5D/exec?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)
     .then(res => res.text())
     .then(role => {
       console.log("伺服器回傳角色：", role); // 加入此行以除錯
