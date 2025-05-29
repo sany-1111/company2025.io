@@ -176,7 +176,7 @@
       const pass = document.getElementById("password").value.trim();
       const error = document.getElementById("loginError");
 
-      fetch(`https://script.google.com/macros/s/AKfycbwEnWx0XMERKmImjk5RJxJGC5RpeS9DEklt9PHt7N8TmdSdnbIoHAD-FYpO07y5N-HB/execc?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)
+      fetch(`https://script.google.com/macros/s/AKfycbzT8opiinjMXtXyMFtnexg8ZWXFBqgnEh6hJckEBf4m4zui5NGQcnPdfoaT6qIjU78I/exec?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)
         .then(res => res.text())
         .then(role => {
           if (role === "staff") {
@@ -206,7 +206,7 @@
     }
 
     function loadLeaveData() {
-      fetch("https://script.google.com/macros/s/AKfycbwEnWx0XMERKmImjk5RJxJGC5RpeS9DEklt9PHt7N8TmdSdnbIoHAD-FYpO07y5N-HB/exec")
+      fetch("https://script.google.com/macros/s/AKfycbzT8opiinjMXtXyMFtnexg8ZWXFBqgnEh6hJckEBf4m4zui5NGQcnPdfoaT6qIjU78I/exec")
         .then(res => res.json())
         .then(data => {
           const tbody = document.querySelector("#leaveTable tbody");
@@ -242,7 +242,7 @@
         return;
       }
 
-      fetch("https://script.google.com/macros/s/AKfycbwEnWx0XMERKmImjk5RJxJGC5RpeS9DEklt9PHt7N8TmdSdnbIoHAD-FYpO07y5N-HB/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbzT8opiinjMXtXyMFtnexg8ZWXFBqgnEh6hJckEBf4m4zui5NGQcnPdfoaT6qIjU78I/exec", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&role=${role}`
