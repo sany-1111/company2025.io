@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>輕井澤請假表單</title>
+  <style>
+    body {
+      font-family: "微軟正黑體", sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 60px;
+      height: 100vh;
+      margin: 0;
+    }
+    .form-container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 400px;
+    }
+    h2 {
+      text-align: center;
+      color: #2e7d32;
+    }
+    label {
+      margin-top: 12px;
+      display: block;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    .time-options {
+      margin-top: 10px;
+    }
+    .time-options label {
+      margin-right: 10px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #388e3c;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>請假表單</h2>
+    <form method="POST"
+          action="https://script.google.com/macros/s/AKfycbwGf05VZHaLmpSqPpRg5hSL29NN5cVMOa8kVgCYY4vPyyKRgtBXQG58ato5v4l6WBVN/exec"
+          target="hidden_iframe"
+          onsubmit="submitted=true;">
+      
+      <label>姓名</label>
+      <input type="text" name="name" required>
+
+      <label>請假日期</label>
+      <input type="date" name="date" required>
+
+      <label>假別</label>
+      <select name="type" required>
+        <option value="">請選擇</option>
+        <option value="事假">事假</option>
+        <option value="病假">病假</option>
+        <option value="特休">特休</option>
+      </select>
+
+      <label>請假時段</label>
+      <div class="time-options">
+        <label><input type="radio" name="time" value="上午" required> 上午</label>
+        <label><input type="radio" name="time" value="下午"> 下午</label>
+        <label><input type="radio" name="time" value="全天"> 全天</label>
+      </div>
+
+      <label>請假原因</label>
+      <textarea name="reason" rows="4" required></textarea>
+
+      <button type="submit">送出</button>
+    </form>
+  </div>
+
+  <iframe name="hidden_iframe" style="display:none;" onload="if(submitted) alert('✅ 表單已提交並儲存！');"></iframe>
+  <script>let submitted = false;</script>
+</body>
+</html>
