@@ -58,143 +58,45 @@
     button:hover {
       background-color: #388e3c;
     }
-    .logout {
-      margin-top: 10px;
-      background-color: #f44336;
-    }
   </style>
 </head>
-<body onload="checkLogin()">
+<body>
   <div class="form-container">
     <h2>請假表單</h2>
+    <form method="POST"
+          action="https://script.google.com/macros/s/AKfycbzmP06TY1DdBp8vfaHgvF72Za8f9GlGIbhWeqFmgKFYvmE1FitgTevRyFGPIgcySkui/exec"
+          target="hidden_iframe"
+          onsubmit="submitted=true;">
+      
+      <label>姓名</label>
+      <input type="text" name="name" required>
 
-    <label>姓名</label>
-    <input type="text" id="name" disabled>
+      <label>請假日期</label>
+      <input type="date" name="date" required>
 
-    <label>請假日期</label>
-    <input type="date" id="date" required>
+      <label>假別</label>
+      <select name="type" required>
+        <option value="">請選擇</option>
+        <option value="事假">事假</option>
+        <option value="病假">病假</option>
+        <option value="特休">特休</option>
+      </select>
 
-    <label>假別</label>
-    <select id="type" required>
-      <option value="">請選擇</option>
-      <option value="事假">事假</option>
-      <option value="病假">病假</option>
-      <option value="特休">特休</option>
-    </select>
+      <label>請假時段</label>
+      <div class="time-options">
+        <label><input type="radio" name="time" value="上午" required> 上午</label>
+        <label><input type="radio" name="time" value="下午"> 下午</label>
+        <label><input type="radio" name="time" value="全天"> 全天</label>
+      </div>
 
-    <label>請假時段</label>
-    <div class="time-options">
-      <label><input type="radio" name="time" value="上午" required> 上午</label>
-      <label><input type="radio" name="time" value="下午"> 下午</label>
-      <label><input type="radio" name="time" value="全天"> 全天</label>
-    </div>
+      <label>請假原因</label>
+      <textarea name="reason" rows="4" required></textarea>
 
-    <label>請假原因</label>
-    <textarea id="reason" rows="4" required></textarea>
-
-    <button onclick="submitLeave()">送出</button>
-    <button class="logout" onclick="logout()">登出</button>
+      <button type="submit">送出</button>
+    </form>
   </div>
 
-  <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec";
-
-    function checkLogin() {
-      const role = sessionStorage.getItem("userRole");
-      const user = sessionStorage.getItem("username");
-      if (!role || !user) {
-        alert("請先登入");
-        window.location.href = "index.html";
-        return;
-      }
-      document.getElementById("name").value = user;
-    }
-
-    function submitLeave() {
-      const name = document.getElementById("name").value;
-      const date = document.getElementById("date").value;
-      const type = document.getElementById("type").value;
-      const time = document.querySelector('input[name="time"]:checked')?.value;
-      const reason = document.getElementById("reason").value;
-
-      if (!date || !type || !time || !reason) {
-        alert("請填寫所有欄位");
-        return;
-      }
-
-      fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `action=leave&name=${encodeURIComponent(name)}&date=${encodeURIComponent(date)}&type=${encodeURIComponent(type)}&time=${encodeURIComponent(time)}&reason=${encodeURIComponent(reason)}`
-      })
-      .then(res => res.text())
-      .then(result => {
-        if (result === "OK") {
-          alert("✅ 請假資料已送出！");
-          document.getElementById("date").value = "";
-          document.getElementById("type").value = "";
-          document.getElementsByName("time").forEach(el => el.checked = false);
-          document.getElementById("reason").value = "";
-        } else {
-          alert("❌ 送出失敗：" + result);
-        }
-      })
-      .catch(err => {
-        alert("❌ 網路錯誤：" + err);
-      });
-    }
-
-    function logout() {
-      sessionStorage.clear();
-      window.location.href = "index.html";
-    }
-  </script>
+  <iframe name="hidden_iframe" style="display:none;" onload="if(submitted) alert('✅ 表單已提交並儲存！');"></iframe>
+  <script>let submitted = false;</script>
 </body>
 </html>
-.then(role => {
-  console.log("伺服器回傳角色：", role); // 👉 加這行
-
-  if (role === "staff") {
-    sessionStorage.setItem("username", user);
-    sessionStorage.setItem("userRole", "staff");
-    window.location.href = "leave.html";
-  } else if (role === "manager" || role === "admin") {
-    sessionStorage.setItem("username", user);
-    sessionStorage.setItem("userRole", role);
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("tabs").style.display = "flex";
-    switchTab("leave");
-    loadLeaveData();
-  } else {
-    error.textContent = "❌ 帳號或密碼錯誤";
-  }
-})
-function login() {
-  const user = document.getElementById("username").value.trim();
-  const pass = document.getElementById("password").value.trim();
-  const error = document.getElementById("loginError");
-
-  fetch(`https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)
-    .then(res => res.text())
-    .then(role => {
-      console.log("伺服器回傳角色：", role); // 加入此行以除錯
-
-      if (role === "staff") {
-        sessionStorage.setItem("username", user);
-        sessionStorage.setItem("userRole", "staff");
-        window.location.href = "leave.html";
-      } else if (role === "manager" || role === "admin") {
-        sessionStorage.setItem("username", user);
-        sessionStorage.setItem("userRole", role);
-        document.getElementById("loginBox").style.display = "none";
-        document.getElementById("tabs").style.display = "flex";
-        switchTab("leave");
-        loadLeaveData();
-      } else {
-        error.textContent = "❌ 帳號或密碼錯誤";
-      }
-    })
-    .catch(err => {
-      error.textContent = "❌ 登入失敗：" + err;
-    });
-}
