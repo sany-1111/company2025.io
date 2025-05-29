@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -7,8 +6,8 @@
   <style>
     body {
       margin: 0;
-      background-color: #ffffff;
       font-family: "微軟正黑體", sans-serif;
+      background-color: #f4f4f4;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -16,25 +15,24 @@
     }
 
     .login-box, .tab-section {
-      background-color: #fff;
-      padding: 40px 30px;
-      border-radius: 16px;
-      box-shadow: 0 0 25px rgba(0,0,0,0.08);
+      background: #fff;
+      padding: 30px;
+      margin-top: 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
       width: 90%;
       max-width: 900px;
       text-align: center;
-      margin-top: 40px;
     }
 
     .login-box img {
-      width: 200px;
-      height: auto;
-      margin-bottom: 25px;
+      width: 180px;
+      margin-bottom: 20px;
     }
 
     h2, h3 {
-      margin: 0 0 20px 0;
       color: #333;
+      margin-bottom: 20px;
     }
 
     input, select {
@@ -48,13 +46,13 @@
     button {
       width: 100%;
       padding: 12px;
+      margin-top: 10px;
       background-color: #4A90E2;
       color: white;
       font-weight: bold;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      margin-top: 10px;
     }
 
     button:hover {
@@ -63,8 +61,8 @@
 
     .tabs {
       display: none;
-      margin-top: 20px;
       gap: 10px;
+      margin-top: 20px;
     }
 
     .tab-btn {
@@ -74,7 +72,6 @@
       background-color: #e0e0e0;
       cursor: pointer;
       font-weight: bold;
-      margin-right: 10px;
     }
 
     .tab-btn.active {
@@ -85,7 +82,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-top: 20px;
     }
 
     th, td {
@@ -106,25 +103,33 @@
     #leaveTab, #registerTab {
       display: none;
     }
+
+    #logoutBtn {
+      margin-top: 20px;
+      width: auto;
+      padding: 8px 16px;
+      background-color: #f44336;
+    }
   </style>
 </head>
 <body>
 
+  <!-- 登入畫面 -->
   <div class="login-box" id="loginBox">
     <img src="logo.png" alt="輕井澤 Logo">
     <h2>登入系統</h2>
     <input type="text" id="username" placeholder="帳號">
     <input type="password" id="password" placeholder="密碼">
     <button onclick="login()">登入</button>
-    <p id="loginError" style="color:red; margin-top:10px;"></p>
+    <p id="loginError" style="color:red;"></p>
   </div>
 
-  <!-- 分頁導覽 -->
+  <!-- 分頁按鈕 -->
   <div class="tabs" id="tabs">
     <button class="tab-btn active" onclick="switchTab('leave')">📋 請假紀錄</button>
     <button class="tab-btn" onclick="switchTab('register')">➕ 建立帳號</button>
+    <button id="logoutBtn" onclick="logout()">登出</button>
   </div>
-  <button onclick="logout()" style="margin-top:20px; background-color:#f44336; display:none;" id="logoutBtn">🚪 登出</button>
 
   <!-- 請假紀錄 -->
   <div class="tab-section" id="leaveTab">
@@ -153,40 +158,35 @@
   </div>
 
   <script>
-    window.onload = function () {
-      const role = sessionStorage.getItem("loginRole");
-      if (role === "manager" || role === "admin") {
+    const API_URL = "https://script.google.com/macros/s/AKfycbwSgfimBu2L7JMKXnxnNmqkqcncT4szf9saXas1j_wHHI4OSMLlvvGdAEBgu7rgX7bF/exec";
+
+    window.onload = function() {
+      const userRole = sessionStorage.getItem("role");
+      if (userRole === "manager" || userRole === "admin") {
         document.getElementById("loginBox").style.display = "none";
         document.getElementById("tabs").style.display = "flex";
-        document.getElementById("logoutBtn").style.display = "block";
         switchTab("leave");
         loadLeaveData();
-      } else if (role === "staff") {
+      } else if (userRole === "staff") {
         window.location.href = "leave.html";
       }
     };
-
-    function logout() {
-      sessionStorage.clear();
-      window.location.href = "index.html";
-    }
 
     function login() {
       const user = document.getElementById("username").value.trim();
       const pass = document.getElementById("password").value.trim();
       const error = document.getElementById("loginError");
 
-      fetch(`https://script.google.com/macros/s/AKfycbzT8opiinjMXtXyMFtnexg8ZWXFBqgnEh6hJckEBf4m4zui5NGQcnPdfoaT6qIjU78I/exec?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)
+      fetch(`${API_URL}?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)
         .then(res => res.text())
         .then(role => {
           if (role === "staff") {
-            sessionStorage.setItem("loginRole", "staff");
+            sessionStorage.setItem("role", "staff");
             window.location.href = "leave.html";
           } else if (role === "manager" || role === "admin") {
-            sessionStorage.setItem("loginRole", role);
+            sessionStorage.setItem("role", role);
             document.getElementById("loginBox").style.display = "none";
             document.getElementById("tabs").style.display = "flex";
-            document.getElementById("logoutBtn").style.display = "block";
             switchTab("leave");
             loadLeaveData();
           } else {
@@ -205,8 +205,13 @@
       document.getElementById(tab + "Tab").style.display = "block";
     }
 
+    function logout() {
+      sessionStorage.clear();
+      location.href = "index.html";
+    }
+
     function loadLeaveData() {
-      fetch("https://script.google.com/macros/s/AKfycbzT8opiinjMXtXyMFtnexg8ZWXFBqgnEh6hJckEBf4m4zui5NGQcnPdfoaT6qIjU78I/exec")
+      fetch("https://script.google.com/macros/s/AKfycbwXKwsvBkHC6CjNLrdfAfQI2zEZVgmYZS4wZIhFx2JsfHvVWPXDrIrx1z6BzZvOIb1G/exec")
         .then(res => res.json())
         .then(data => {
           const tbody = document.querySelector("#leaveTable tbody");
@@ -226,7 +231,6 @@
         })
         .catch(err => {
           alert("❌ 請假資料讀取失敗");
-          console.error(err);
         });
     }
 
@@ -242,28 +246,28 @@
         return;
       }
 
-      fetch("https://script.google.com/macros/s/AKfycbzT8opiinjMXtXyMFtnexg8ZWXFBqgnEh6hJckEBf4m4zui5NGQcnPdfoaT6qIjU78I/exec", {
+      fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&role=${role}`
       })
-      .then(res => res.text())
-      .then(result => {
-        if (result === "OK") {
-          msg.style.color = "green";
-          msg.textContent = "✅ 帳號建立成功";
-        } else if (result === "EXISTS") {
+        .then(res => res.text())
+        .then(result => {
+          if (result === "OK") {
+            msg.style.color = "green";
+            msg.textContent = "✅ 帳號建立成功";
+          } else if (result === "EXISTS") {
+            msg.style.color = "red";
+            msg.textContent = "⚠️ 帳號已存在";
+          } else {
+            msg.style.color = "red";
+            msg.textContent = "❌ 建立失敗：" + result;
+          }
+        })
+        .catch(err => {
           msg.style.color = "red";
-          msg.textContent = "⚠️ 帳號已存在";
-        } else {
-          msg.style.color = "red";
-          msg.textContent = "❌ 建立失敗：" + result;
-        }
-      })
-      .catch(err => {
-        msg.style.color = "red";
-        msg.textContent = "❌ 網路錯誤：" + err;
-      });
+          msg.textContent = "❌ 錯誤：" + err;
+        });
     }
   </script>
 </body>
