@@ -169,3 +169,32 @@
     error.textContent = "❌ 帳號或密碼錯誤";
   }
 })
+function login() {
+  const user = document.getElementById("username").value.trim();
+  const pass = document.getElementById("password").value.trim();
+  const error = document.getElementById("loginError");
+
+  fetch(`https://script.google.com/macros/s/AKfycbwSgfimBu2L7JMKXnxnNmqkqcncT4szf9saXas1j_wHHI4OSMLlvvGdAEBgu7rgX7bF/exec?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)
+    .then(res => res.text())
+    .then(role => {
+      console.log("伺服器回傳角色：", role); // 加入此行以除錯
+
+      if (role === "staff") {
+        sessionStorage.setItem("username", user);
+        sessionStorage.setItem("userRole", "staff");
+        window.location.href = "leave.html";
+      } else if (role === "manager" || role === "admin") {
+        sessionStorage.setItem("username", user);
+        sessionStorage.setItem("userRole", role);
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("tabs").style.display = "flex";
+        switchTab("leave");
+        loadLeaveData();
+      } else {
+        error.textContent = "❌ 帳號或密碼錯誤";
+      }
+    })
+    .catch(err => {
+      error.textContent = "❌ 登入失敗：" + err;
+    });
+}
