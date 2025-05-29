@@ -58,45 +58,96 @@
     button:hover {
       background-color: #388e3c;
     }
+    .logout {
+      margin-top: 10px;
+      background-color: #f44336;
+    }
   </style>
 </head>
-<body>
+<body onload="checkLogin()">
   <div class="form-container">
     <h2>請假表單</h2>
-    <form method="POST"
-          action="https://script.google.com/macros/s/AKfycbzT8opiinjMXtXyMFtnexg8ZWXFBqgnEh6hJckEBf4m4zui5NGQcnPdfoaT6qIjU78I/exec"
-          target="hidden_iframe"
-          onsubmit="submitted=true;">
-      
-      <label>姓名</label>
-      <input type="text" name="name" required>
 
-      <label>請假日期</label>
-      <input type="date" name="date" required>
+    <label>姓名</label>
+    <input type="text" id="name" disabled>
 
-      <label>假別</label>
-      <select name="type" required>
-        <option value="">請選擇</option>
-        <option value="事假">事假</option>
-        <option value="病假">病假</option>
-        <option value="特休">特休</option>
-      </select>
+    <label>請假日期</label>
+    <input type="date" id="date" required>
 
-      <label>請假時段</label>
-      <div class="time-options">
-        <label><input type="radio" name="time" value="上午" required> 上午</label>
-        <label><input type="radio" name="time" value="下午"> 下午</label>
-        <label><input type="radio" name="time" value="全天"> 全天</label>
-      </div>
+    <label>假別</label>
+    <select id="type" required>
+      <option value="">請選擇</option>
+      <option value="事假">事假</option>
+      <option value="病假">病假</option>
+      <option value="特休">特休</option>
+    </select>
 
-      <label>請假原因</label>
-      <textarea name="reason" rows="4" required></textarea>
+    <label>請假時段</label>
+    <div class="time-options">
+      <label><input type="radio" name="time" value="上午" required> 上午</label>
+      <label><input type="radio" name="time" value="下午"> 下午</label>
+      <label><input type="radio" name="time" value="全天"> 全天</label>
+    </div>
 
-      <button type="submit">送出</button>
-    </form>
+    <label>請假原因</label>
+    <textarea id="reason" rows="4" required></textarea>
+
+    <button onclick="submitLeave()">送出</button>
+    <button class="logout" onclick="logout()">登出</button>
   </div>
 
-  <iframe name="hidden_iframe" style="display:none;" onload="if(submitted) alert('✅ 表單已提交並儲存！');"></iframe>
-  <script>let submitted = false;</script>
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwSgfimBu2L7JMKXnxnNmqkqcncT4szf9saXas1j_wHHI4OSMLlvvGdAEBgu7rgX7bF/exec";
+
+    function checkLogin() {
+      const role = sessionStorage.getItem("userRole");
+      const user = sessionStorage.getItem("username");
+      if (!role || !user) {
+        alert("請先登入");
+        window.location.href = "index.html";
+        return;
+      }
+      document.getElementById("name").value = user;
+    }
+
+    function submitLeave() {
+      const name = document.getElementById("name").value;
+      const date = document.getElementById("date").value;
+      const type = document.getElementById("type").value;
+      const time = document.querySelector('input[name="time"]:checked')?.value;
+      const reason = document.getElementById("reason").value;
+
+      if (!date || !type || !time || !reason) {
+        alert("請填寫所有欄位");
+        return;
+      }
+
+      fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `action=leave&name=${encodeURIComponent(name)}&date=${encodeURIComponent(date)}&type=${encodeURIComponent(type)}&time=${encodeURIComponent(time)}&reason=${encodeURIComponent(reason)}`
+      })
+      .then(res => res.text())
+      .then(result => {
+        if (result === "OK") {
+          alert("✅ 請假資料已送出！");
+          document.getElementById("date").value = "";
+          document.getElementById("type").value = "";
+          document.getElementsByName("time").forEach(el => el.checked = false);
+          document.getElementById("reason").value = "";
+        } else {
+          alert("❌ 送出失敗：" + result);
+        }
+      })
+      .catch(err => {
+        alert("❌ 網路錯誤：" + err);
+      });
+    }
+
+    function logout() {
+      sessionStorage.clear();
+      window.location.href = "index.html";
+    }
+  </script>
 </body>
 </html>
