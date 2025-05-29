@@ -6,35 +6,31 @@
   <style>
     body {
       margin: 0;
+      background-color: #ffffff;
       font-family: "微軟正黑體", sans-serif;
-      background-color: #f4f4f4;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
     }
-
     .login-box, .tab-section {
-      background: #fff;
-      padding: 30px;
-      margin-top: 40px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      background-color: #fff;
+      padding: 40px 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.08);
       width: 90%;
       max-width: 900px;
       text-align: center;
+      margin-top: 40px;
     }
-
     .login-box img {
-      width: 180px;
-      margin-bottom: 20px;
+      width: 200px;
+      margin-bottom: 25px;
     }
-
     h2, h3 {
-      color: #333;
       margin-bottom: 20px;
+      color: #333;
     }
-
     input, select {
       width: 100%;
       padding: 12px;
@@ -42,29 +38,25 @@
       border-radius: 8px;
       border: 1px solid #ccc;
     }
-
     button {
       width: 100%;
       padding: 12px;
-      margin-top: 10px;
       background-color: #4A90E2;
       color: white;
       font-weight: bold;
       border: none;
       border-radius: 8px;
       cursor: pointer;
+      margin-top: 10px;
     }
-
     button:hover {
       background-color: #357ABD;
     }
-
     .tabs {
       display: none;
-      gap: 10px;
       margin-top: 20px;
+      gap: 10px;
     }
-
     .tab-btn {
       padding: 10px 20px;
       border: none;
@@ -72,79 +64,61 @@
       background-color: #e0e0e0;
       cursor: pointer;
       font-weight: bold;
+      margin-right: 10px;
     }
-
     .tab-btn.active {
       background-color: #4A90E2;
       color: white;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      margin-top: 10px;
     }
-
     th, td {
       border: 1px solid #ccc;
       padding: 10px;
       text-align: center;
     }
-
     th {
       background-color: #4A90E2;
       color: white;
     }
-
     tr:nth-child(even) {
       background-color: #f9f9f9;
     }
-
     #leaveTab, #registerTab {
       display: none;
     }
-
-    #logoutBtn {
-      margin-top: 20px;
-      width: auto;
-      padding: 8px 16px;
-      background-color: #f44336;
-    }
   </style>
 </head>
-<body>
+<body onload="checkSession()">
 
-  <!-- 登入畫面 -->
   <div class="login-box" id="loginBox">
     <img src="logo.png" alt="輕井澤 Logo">
     <h2>登入系統</h2>
     <input type="text" id="username" placeholder="帳號">
     <input type="password" id="password" placeholder="密碼">
     <button onclick="login()">登入</button>
-    <p id="loginError" style="color:red;"></p>
+    <p id="loginError" style="color:red; margin-top:10px;"></p>
   </div>
 
-  <!-- 分頁按鈕 -->
   <div class="tabs" id="tabs">
     <button class="tab-btn active" onclick="switchTab('leave')">📋 請假紀錄</button>
     <button class="tab-btn" onclick="switchTab('register')">➕ 建立帳號</button>
-    <button id="logoutBtn" onclick="logout()">登出</button>
+    <button class="tab-btn" onclick="logout()">🚪 登出</button>
   </div>
 
-  <!-- 請假紀錄 -->
   <div class="tab-section" id="leaveTab">
     <h3>📋 請假紀錄</h3>
     <table id="leaveTable">
       <thead>
-        <tr>
-          <th>姓名</th><th>請假日期</th><th>假別</th><th>時段</th><th>原因</th><th>送出時間</th>
-        </tr>
+        <tr><th>姓名</th><th>請假日期</th><th>假別</th><th>時段</th><th>原因</th><th>送出時間</th></tr>
       </thead>
       <tbody></tbody>
     </table>
   </div>
 
-  <!-- 建立帳號 -->
   <div class="tab-section" id="registerTab">
     <h3>➕ 建立帳號</h3>
     <input type="text" id="newUser" placeholder="帳號">
@@ -158,19 +132,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwSgfimBu2L7JMKXnxnNmqkqcncT4szf9saXas1j_wHHI4OSMLlvvGdAEBgu7rgX7bF/exec";
-
-    window.onload = function() {
-      const userRole = sessionStorage.getItem("role");
-      if (userRole === "manager" || userRole === "admin") {
-        document.getElementById("loginBox").style.display = "none";
-        document.getElementById("tabs").style.display = "flex";
-        switchTab("leave");
-        loadLeaveData();
-      } else if (userRole === "staff") {
-        window.location.href = "leave.html";
-      }
-    };
+    const API_URL = "https://script.google.com/macros/s/AKfycbzT8opiinjMXtXyMFtnexg8ZWXFBqgnEh6hJckEBf4m4zui5NGQcnPdfoaT6qIjU78I/exec";
 
     function login() {
       const user = document.getElementById("username").value.trim();
@@ -181,10 +143,10 @@
         .then(res => res.text())
         .then(role => {
           if (role === "staff") {
-            sessionStorage.setItem("role", "staff");
+            sessionStorage.setItem("userRole", "staff");
             window.location.href = "leave.html";
           } else if (role === "manager" || role === "admin") {
-            sessionStorage.setItem("role", role);
+            sessionStorage.setItem("userRole", role);
             document.getElementById("loginBox").style.display = "none";
             document.getElementById("tabs").style.display = "flex";
             switchTab("leave");
@@ -198,6 +160,25 @@
         });
     }
 
+    function checkSession() {
+      const role = sessionStorage.getItem("userRole");
+      if (role === "manager" || role === "admin") {
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("tabs").style.display = "flex";
+        switchTab("leave");
+        loadLeaveData();
+      } else if (role === "staff") {
+        window.location.href = "leave.html";
+      } else {
+        sessionStorage.clear();
+      }
+    }
+
+    function logout() {
+      sessionStorage.clear();
+      window.location.href = "index.html";
+    }
+
     function switchTab(tab) {
       document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
       document.querySelectorAll(".tab-section").forEach(div => div.style.display = "none");
@@ -205,13 +186,8 @@
       document.getElementById(tab + "Tab").style.display = "block";
     }
 
-    function logout() {
-      sessionStorage.clear();
-      location.href = "index.html";
-    }
-
     function loadLeaveData() {
-      fetch("https://script.google.com/macros/s/AKfycbwXKwsvBkHC6CjNLrdfAfQI2zEZVgmYZS4wZIhFx2JsfHvVWPXDrIrx1z6BzZvOIb1G/exec")
+      fetch(API_URL)
         .then(res => res.json())
         .then(data => {
           const tbody = document.querySelector("#leaveTable tbody");
@@ -231,6 +207,7 @@
         })
         .catch(err => {
           alert("❌ 請假資料讀取失敗");
+          console.error(err);
         });
     }
 
@@ -249,25 +226,25 @@
       fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&role=${role}`
+        body: `action=register&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&role=${role}`
       })
-        .then(res => res.text())
-        .then(result => {
-          if (result === "OK") {
-            msg.style.color = "green";
-            msg.textContent = "✅ 帳號建立成功";
-          } else if (result === "EXISTS") {
-            msg.style.color = "red";
-            msg.textContent = "⚠️ 帳號已存在";
-          } else {
-            msg.style.color = "red";
-            msg.textContent = "❌ 建立失敗：" + result;
-          }
-        })
-        .catch(err => {
+      .then(res => res.text())
+      .then(result => {
+        if (result === "OK") {
+          msg.style.color = "green";
+          msg.textContent = "✅ 帳號建立成功";
+        } else if (result === "EXISTS") {
           msg.style.color = "red";
-          msg.textContent = "❌ 錯誤：" + err;
-        });
+          msg.textContent = "⚠️ 帳號已存在";
+        } else {
+          msg.style.color = "red";
+          msg.textContent = "❌ 建立失敗：" + result;
+        }
+      })
+      .catch(err => {
+        msg.style.color = "red";
+        msg.textContent = "❌ 網路錯誤：" + err;
+      });
     }
   </script>
 </body>
