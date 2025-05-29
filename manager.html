@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>主管請假資料總覽</title>
+  <style>
+    body {
+      font-family: "微軟正黑體", sans-serif;
+      background-color: #f0f0f0;
+      padding: 30px;
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #3498db;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <h2>主管後台 - 請假紀錄總覽</h2>
+  <table id="leaveTable">
+    <thead>
+      <tr>
+        <th>姓名</th>
+        <th>請假日期</th>
+        <th>假別</th>
+        <th>時段</th>
+        <th>原因</th>
+        <th>送出時間</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 資料將由 JavaScript 填入 -->
+    </tbody>
+  </table>
+
+  <script>
+    fetch("https://script.google.com/macros/s/AKfycbw-fNcJk8G3kXqIWLVoqhMHYz7gMFRnsPv5XqA5m62HlJ2WPMaKbdI-6hvl8ptuu8CT/exec")
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.querySelector("#leaveTable tbody");
+        data.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row.name || ""}</td>
+            <td>${row.date || ""}</td>
+            <td>${row.type || ""}</td>
+            <td>${row.time || ""}</td>
+            <td>${row.reason || ""}</td>
+            <td>${new Date(row["Timestamp"] || row["送出時間"]).toLocaleString()}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => {
+        alert("❌ 資料讀取失敗，請檢查 API 或工作表權限");
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
