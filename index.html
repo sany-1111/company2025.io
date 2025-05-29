@@ -105,6 +105,13 @@
     #leaveTab, #registerTab {
       display: none;
     }
+
+    #logoutBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -117,6 +124,9 @@
     <button onclick="login()">登入</button>
     <p id="loginError" style="color:red; margin-top:10px;"></p>
   </div>
+
+  <!-- 登出按鈕 -->
+  <button id="logoutBtn" onclick="logout()">登出</button>
 
   <!-- 分頁導覽 -->
   <div class="tabs" id="tabs">
@@ -152,29 +162,33 @@
 
   <script>
     function login() {
-  const user = document.getElementById("username").value.trim();
-  const pass = document.getElementById("password").value.trim();
-  const error = document.getElementById("loginError");
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      const error = document.getElementById("loginError");
 
-  fetch(`https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)
-    .then(res => res.text())
-    .then(role => {
-      if (role === "staff") {
-        window.location.href = "leave.html";
-      } else if (role === "manager" || role === "admin") {
-        document.getElementById("loginBox").style.display = "none";
-        document.getElementById("tabs").style.display = "flex";
-        switchTab("leave");
-        loadLeaveData();
-      } else {
-        error.textContent = "❌ 帳號或密碼錯誤";
-      }
-    })
-    .catch(err => {
-      error.textContent = "❌ 登入失敗：" + err;
-    });
-}
-
+      fetch(`https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)
+        .then(res => res.text())
+        .then(role => {
+          if (role === "staff") {
+            localStorage.setItem("username", user);
+            localStorage.setItem("role", role);
+            window.location.href = "leave.html";
+          } else if (role === "manager" || role === "admin") {
+            localStorage.setItem("username", user);
+            localStorage.setItem("role", role);
+            document.getElementById("loginBox").style.display = "none";
+            document.getElementById("tabs").style.display = "flex";
+            document.getElementById("logoutBtn").style.display = "block";
+            switchTab("leave");
+            loadLeaveData();
+          } else {
+            error.textContent = "❌ 帳號或密碼錯誤";
+          }
+        })
+        .catch(err => {
+          error.textContent = "❌ 登入失敗：" + err;
+        });
+    }
 
     function switchTab(tab) {
       document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
@@ -209,42 +223,65 @@
     }
 
     function registerUser() {
-  const user = document.getElementById("newUser").value.trim();
-  const pass = document.getElementById("newPass").value.trim();
-  const role = document.getElementById("newRole").value;
-  const msg = document.getElementById("registerMsg");
+      const user = document.getElementById("newUser").value.trim();
+      const pass = document.getElementById("newPass").value.trim();
+      const role = document.getElementById("newRole").value;
+      const msg = document.getElementById("registerMsg");
 
-  if (!user || !pass) {
-    msg.style.color = "red";
-    msg.textContent = "❗請輸入完整帳號與密碼";
-    return;
-  }
+      if (!user || !pass) {
+        msg.style.color = "red";
+        msg.textContent = "❗請輸入完整帳號與密碼";
+        return;
+      }
 
-  fetch("https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&role=${role}`
-  })
-  .then(res => res.text())
-  .then(result => {
-    console.log("⚠️ 回傳結果：", result); // ✅ 顯示真實錯誤內容
-    if (result === "OK") {
-      msg.style.color = "green";
-      msg.textContent = "✅ 帳號建立成功";
-    } else if (result === "EXISTS") {
-      msg.style.color = "red";
-      msg.textContent = "⚠️ 帳號已存在";
-    } else {
-      msg.style.color = "red";
-      msg.textContent = "❌ 建立失敗：" + result; // ✅ 顯示實際錯誤
+      fetch("https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&role=${role}`
+      })
+      .then(res => res.text())
+      .then(result => {
+        console.log("⚠️ 回傳結果：", result);
+        if (result === "OK") {
+          msg.style.color = "green";
+          msg.textContent = "✅ 帳號建立成功";
+        } else if (result === "EXISTS") {
+          msg.style.color = "red";
+          msg.textContent = "⚠️ 帳號已存在";
+        } else {
+          msg.style.color = "red";
+          msg.textContent = "❌ 建立失敗：" + result;
+        }
+      })
+      .catch(err => {
+        msg.style.color = "red";
+        msg.textContent = "❌ 網路錯誤：" + err;
+      });
     }
-  })
-  .catch(err => {
-    msg.style.color = "red";
-    msg.textContent = "❌ 網路錯誤：" + err;
-  });
-}
 
+    function logout() {
+      localStorage.removeItem("username");
+      localStorage.removeItem("role");
+      window.location.href = "index.html";
+    }
+
+    window.onload = function () {
+      const role = localStorage.getItem("role");
+      const user = localStorage.getItem("username");
+
+      if (role === "manager" || role === "admin") {
+        document.getElementById("logoutBtn").style.display = "block";
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("tabs").style.display = "flex";
+        switchTab("leave");
+        loadLeaveData();
+      }
+
+      history.pushState(null, null, location.href);
+      window.onpopstate = function () {
+        history.go(1);
+      };
+    };
   </script>
 </body>
 </html>
