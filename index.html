@@ -106,8 +106,9 @@
       display: none;
     }
 
-    /* ✅ 登出按鈕固定右上角 */
+    /* ✅ 登出按鈕樣式（不被全域 button 限制） */
     #logoutBtn {
+      width: auto;
       position: fixed;
       top: 16px;
       right: 20px;
@@ -119,7 +120,7 @@
       cursor: pointer;
       font-size: 14px;
       font-weight: bold;
-      z-index: 999;
+      z-index: 9999;
       display: none;
     }
 
@@ -133,6 +134,7 @@
   <!-- ✅ 登出按鈕 -->
   <button id="logoutBtn" onclick="logout()">登出</button>
 
+  <!-- 登入畫面 -->
   <div class="login-box" id="loginBox">
     <img src="logo.png" alt="輕井澤 Logo">
     <h2>登入系統</h2>
