@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -123,6 +124,7 @@
     <button class="tab-btn active" onclick="switchTab('leave')">📋 請假紀錄</button>
     <button class="tab-btn" onclick="switchTab('register')">➕ 建立帳號</button>
   </div>
+  <button onclick="logout()" style="margin-top:20px; background-color:#f44336; display:none;" id="logoutBtn">🚪 登出</button>
 
   <!-- 請假紀錄 -->
   <div class="tab-section" id="leaveTab">
@@ -151,30 +153,50 @@
   </div>
 
   <script>
-    function login() {
-  const user = document.getElementById("username").value.trim();
-  const pass = document.getElementById("password").value.trim();
-  const error = document.getElementById("loginError");
-
-  fetch(`https://script.google.com/macros/s/AKfycbwSgfimBu2L7JMKXnxnNmqkqcncT4szf9saXas1j_wHHI4OSMLlvvGdAEBgu7rgX7bF/exec?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)
-    .then(res => res.text())
-    .then(role => {
-      if (role === "staff") {
-        window.location.href = "leave.html";
-      } else if (role === "manager" || role === "admin") {
+    window.onload = function () {
+      const role = sessionStorage.getItem("loginRole");
+      if (role === "manager" || role === "admin") {
         document.getElementById("loginBox").style.display = "none";
         document.getElementById("tabs").style.display = "flex";
+        document.getElementById("logoutBtn").style.display = "block";
         switchTab("leave");
         loadLeaveData();
-      } else {
-        error.textContent = "❌ 帳號或密碼錯誤";
+      } else if (role === "staff") {
+        window.location.href = "leave.html";
       }
-    })
-    .catch(err => {
-      error.textContent = "❌ 登入失敗：" + err;
-    });
-}
+    };
 
+    function logout() {
+      sessionStorage.clear();
+      window.location.href = "index.html";
+    }
+
+    function login() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      const error = document.getElementById("loginError");
+
+      fetch(`https://script.google.com/macros/s/AKfycbwSgfimBu2L7JMKXnxnNmqkqcncT4szf9saXas1j_wHHI4OSMLlvvGdAEBgu7rgX7bF/exec?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)
+        .then(res => res.text())
+        .then(role => {
+          if (role === "staff") {
+            sessionStorage.setItem("loginRole", "staff");
+            window.location.href = "leave.html";
+          } else if (role === "manager" || role === "admin") {
+            sessionStorage.setItem("loginRole", role);
+            document.getElementById("loginBox").style.display = "none";
+            document.getElementById("tabs").style.display = "flex";
+            document.getElementById("logoutBtn").style.display = "block";
+            switchTab("leave");
+            loadLeaveData();
+          } else {
+            error.textContent = "❌ 帳號或密碼錯誤";
+          }
+        })
+        .catch(err => {
+          error.textContent = "❌ 登入失敗：" + err;
+        });
+    }
 
     function switchTab(tab) {
       document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
@@ -209,42 +231,40 @@
     }
 
     function registerUser() {
-  const user = document.getElementById("newUser").value.trim();
-  const pass = document.getElementById("newPass").value.trim();
-  const role = document.getElementById("newRole").value;
-  const msg = document.getElementById("registerMsg");
+      const user = document.getElementById("newUser").value.trim();
+      const pass = document.getElementById("newPass").value.trim();
+      const role = document.getElementById("newRole").value;
+      const msg = document.getElementById("registerMsg");
 
-  if (!user || !pass) {
-    msg.style.color = "red";
-    msg.textContent = "❗請輸入完整帳號與密碼";
-    return;
-  }
+      if (!user || !pass) {
+        msg.style.color = "red";
+        msg.textContent = "❗請輸入完整帳號與密碼";
+        return;
+      }
 
-  fetch("https://script.google.com/macros/s/AKfycbwSgfimBu2L7JMKXnxnNmqkqcncT4szf9saXas1j_wHHI4OSMLlvvGdAEBgu7rgX7bF/exec", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&role=${role}`
-  })
-  .then(res => res.text())
-  .then(result => {
-    console.log("⚠️ 回傳結果：", result); // ✅ 顯示真實錯誤內容
-    if (result === "OK") {
-      msg.style.color = "green";
-      msg.textContent = "✅ 帳號建立成功";
-    } else if (result === "EXISTS") {
-      msg.style.color = "red";
-      msg.textContent = "⚠️ 帳號已存在";
-    } else {
-      msg.style.color = "red";
-      msg.textContent = "❌ 建立失敗：" + result; // ✅ 顯示實際錯誤
+      fetch("https://script.google.com/macros/s/AKfycbwSgfimBu2L7JMKXnxnNmqkqcncT4szf9saXas1j_wHHI4OSMLlvvGdAEBgu7rgX7bF/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&role=${role}`
+      })
+      .then(res => res.text())
+      .then(result => {
+        if (result === "OK") {
+          msg.style.color = "green";
+          msg.textContent = "✅ 帳號建立成功";
+        } else if (result === "EXISTS") {
+          msg.style.color = "red";
+          msg.textContent = "⚠️ 帳號已存在";
+        } else {
+          msg.style.color = "red";
+          msg.textContent = "❌ 建立失敗：" + result;
+        }
+      })
+      .catch(err => {
+        msg.style.color = "red";
+        msg.textContent = "❌ 網路錯誤：" + err;
+      });
     }
-  })
-  .catch(err => {
-    msg.style.color = "red";
-    msg.textContent = "❌ 網路錯誤：" + err;
-  });
-}
-
   </script>
 </body>
 </html>
