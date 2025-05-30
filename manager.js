@@ -7,8 +7,10 @@ function logout() {
 function switchTab(tab) {
   document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
   document.querySelectorAll(".tab-section").forEach(div => div.style.display = "none");
-  document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add("active");
-  document.getElementById(tab + "Tab").style.display = "block";
+  const tabBtn = document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`);
+  const tabContent = document.getElementById(tab + "Tab");
+  if (tabBtn) tabBtn.classList.add("active");
+  if (tabContent) tabContent.style.display = "block";
 }
 
 function loadLeaveData() {
@@ -16,6 +18,7 @@ function loadLeaveData() {
     .then(res => res.json())
     .then(data => {
       const tbody = document.querySelector("#leaveTable tbody");
+      if (!tbody) return;
       tbody.innerHTML = "";
       data.forEach(row => {
         const tr = document.createElement("tr");
@@ -78,15 +81,14 @@ window.onload = function () {
   const user = localStorage.getItem("username");
 
   if (role === "manager" || role === "admin") {
-    const tabs = document.getElementById("tabs");
-    if (tabs) {
-      document.getElementById("logoutBtn").style.display = "block";
-      tabs.style.display = "flex";
-      switchTab("leave");
-      loadLeaveData();
-    } else {
-      console.error("❌ 找不到 #tabs 元素");
-    }
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) logoutBtn.style.display = "block";
+
+    const tabContainer = document.querySelector(".tabs");
+    if (tabContainer) tabContainer.style.display = "flex";
+
+    switchTab("leave");
+    loadLeaveData();
   } else {
     alert("請先登入");
     window.location.href = "index.html";
