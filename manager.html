@@ -69,7 +69,7 @@
   <script>
     function loadAccounts() {
       fetch("https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec?action=read")
-        
+        .then(res => res.json())
         .then(data => {
           const tbody = document.querySelector("#accountTable tbody");
           tbody.innerHTML = "";
