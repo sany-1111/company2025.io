@@ -168,14 +168,16 @@
   <!-- 建立帳號 -->
   <div class="tab-section" id="registerTab">
     <h3>➕ 建立帳號</h3>
-    <input type="text" id="newUser" placeholder="帳號">
-    <input type="password" id="newPass" placeholder="密碼">
-    <select id="newRole">
-      <option value="staff">員工</option>
-      <option value="manager">主管</option>
-    </select>
-    <button onclick="registerUser()">建立帳號</button>
-    <p id="registerMsg" style="color:green;"></p>
+<input type="text" id="newRealName" placeholder="真實姓名">
+<input type="text" id="newUser" placeholder="帳號">
+<input type="password" id="newPass" placeholder="密碼">
+<select id="newRole">
+  <option value="staff">員工</option>
+  <option value="manager">主管</option>
+</select>
+<button onclick="registerUser()">建立帳號</button>
+<p id="registerMsg" style="color:green;"></p>
+
   </div>
 <!-- 排班表區塊 -->
 <div class="tab-section" id="scheduleTab">
@@ -253,40 +255,42 @@
     }
 
     function registerUser() {
-      const user = document.getElementById("newUser").value.trim();
-      const pass = document.getElementById("newPass").value.trim();
-      const role = document.getElementById("newRole").value;
-      const msg = document.getElementById("registerMsg");
+  const name = document.getElementById("newRealName").value.trim();
+  const user = document.getElementById("newUser").value.trim();
+  const pass = document.getElementById("newPass").value.trim();
+  const role = document.getElementById("newRole").value;
+  const msg = document.getElementById("registerMsg");
 
-      if (!user || !pass) {
-        msg.style.color = "red";
-        msg.textContent = "❗請輸入完整帳號與密碼";
-        return;
-      }
+  if (!name || !user || !pass) {
+    msg.style.color = "red";
+    msg.textContent = "❗請輸入完整資料";
+    return;
+  }
 
-      fetch("https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&role=${role}`
-      })
-      .then(res => res.text())
-      .then(result => {
-        if (result === "OK") {
-          msg.style.color = "green";
-          msg.textContent = "✅ 帳號建立成功";
-        } else if (result === "EXISTS") {
-          msg.style.color = "red";
-          msg.textContent = "⚠️ 帳號已存在";
-        } else {
-          msg.style.color = "red";
-          msg.textContent = "❌ 建立失敗：" + result;
-        }
-      })
-      .catch(err => {
-        msg.style.color = "red";
-        msg.textContent = "❌ 網路錯誤：" + err;
-      });
+  fetch("https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `name=${encodeURIComponent(name)}&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&role=${role}`
+  })
+  .then(res => res.text())
+  .then(result => {
+    if (result === "OK") {
+      msg.style.color = "green";
+      msg.textContent = "✅ 帳號建立成功";
+    } else if (result === "EXISTS") {
+      msg.style.color = "red";
+      msg.textContent = "⚠️ 帳號已存在";
+    } else {
+      msg.style.color = "red";
+      msg.textContent = "❌ 建立失敗：" + result;
     }
+  })
+  .catch(err => {
+    msg.style.color = "red";
+    msg.textContent = "❌ 網路錯誤：" + err;
+  });
+}
+
 
     window.onload = function () {
       const role = localStorage.getItem("role");
