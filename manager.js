@@ -1,0 +1,94 @@
+function logout() {
+  localStorage.removeItem("username");
+  localStorage.removeItem("role");
+  window.location.href = "index.html";
+}
+
+function switchTab(tab) {
+  document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+  document.querySelectorAll(".tab-section").forEach(div => div.style.display = "none");
+  document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add("active");
+  document.getElementById(tab + "Tab").style.display = "block";
+}
+
+function loadLeaveData() {
+  fetch("https://script.google.com/macros/s/AKfycbzmP06TY1DdBp8vfaHgvF72Za8f9GlGIbhWeqFmgKFYvmE1FitgTevRyFGPIgcySkui/exec")
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.querySelector("#leaveTable tbody");
+      tbody.innerHTML = "";
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.name || ""}</td>
+          <td>${row.date || ""}</td>
+          <td>${row.type || ""}</td>
+          <td>${row.time || ""}</td>
+          <td>${row.reason || ""}</td>
+          <td>${new Date(row["Timestamp"] || row["送出時間"]).toLocaleString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(err => {
+      alert("❌ 請假資料讀取失敗");
+      console.error(err);
+    });
+}
+
+function registerUser() {
+  const name = document.getElementById("newRealName").value.trim();
+  const user = document.getElementById("newUser").value.trim();
+  const pass = document.getElementById("newPass").value.trim();
+  const role = document.getElementById("newRole").value;
+  const msg = document.getElementById("registerMsg");
+
+  if (!name || !user || !pass) {
+    msg.style.color = "red";
+    msg.textContent = "❗請輸入完整資料";
+    return;
+  }
+
+  fetch("https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `name=${encodeURIComponent(name)}&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&role=${role}`
+  })
+    .then(res => res.text())
+    .then(result => {
+      if (result === "OK") {
+        msg.style.color = "green";
+        msg.textContent = "✅ 帳號建立成功";
+      } else if (result === "EXISTS") {
+        msg.style.color = "red";
+        msg.textContent = "⚠️ 帳號已存在";
+      } else {
+        msg.style.color = "red";
+        msg.textContent = "❌ 建立失敗：" + result;
+      }
+    })
+    .catch(err => {
+      msg.style.color = "red";
+      msg.textContent = "❌ 網路錯誤：" + err;
+    });
+}
+
+window.onload = function () {
+  const role = localStorage.getItem("role");
+  const user = localStorage.getItem("username");
+
+  if (role === "manager" || role === "admin") {
+    document.getElementById("logoutBtn").style.display = "block";
+    document.getElementById("tabs").style.display = "flex";
+    switchTab("leave");
+    loadLeaveData();
+  } else {
+    alert("請先登入");
+    window.location.href = "index.html";
+  }
+
+  history.pushState(null, null, location.href);
+  window.onpopstate = function () {
+    history.go(1);
+  };
+};
