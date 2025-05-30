@@ -19,10 +19,10 @@ window.onload = function () {
   }
 
     // 顯示姓名文字
-  document.getElementById("displayName").textContent = name || "";
+  document.getElementById("displayName").textContent = name ;
 
   // 放入隱藏欄位供送出用
-  document.getElementById("realName").value = name || "";
+  document.getElementById("realName").value = name ;
 
   // 防止上一頁返回
   history.pushState(null, null, location.href);
