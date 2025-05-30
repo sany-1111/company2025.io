@@ -66,6 +66,61 @@ function loadAllAccounts() {
     });
 }
 
+function loadScheduleData() {
+  fetch("https://script.google.com/macros/s/AKfycbwT_S7ffcsEwv4EeKk0ZLYKgUoHmOuM77Q7l9I8C4XK11wiehRgdQAmRM3jdCP8dX5D/exec?action=readSchedule")
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("scheduleTab");
+      if (!container) return;
+
+      container.innerHTML = '<h3>📆 排班表</h3>';
+
+      const select = document.createElement("select");
+      for (let day = 1; day <= 31; day++) {
+        const option = document.createElement("option");
+        option.value = day;
+        option.textContent = `${day} 日`;
+        select.appendChild(option);
+      }
+      container.appendChild(select);
+
+      const table = document.createElement("table");
+      table.innerHTML = `
+        <thead><tr><th>時段</th><th>上班人員</th></tr></thead>
+        <tbody></tbody>
+      `;
+      const tbody = table.querySelector("tbody");
+      const hours = [
+        "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00",
+        "14:00-15:00", "15:00-16:00", "16:00-17:00", "17:00-18:00", "18:00-19:00", "19:00-20:00",
+        "20:00-21:00", "21:00-22:00", "22:00-23:00"
+      ];
+      hours.forEach(h => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${h}</td><td></td>`;
+        tbody.appendChild(tr);
+      });
+      container.appendChild(table);
+
+      select.addEventListener("change", () => {
+        const selectedDay = select.value;
+        const rows = table.querySelectorAll("tbody tr");
+
+        rows.forEach((tr, idx) => {
+          const hour = hours[idx];
+          const key = `${selectedDay}_${hour}`;
+          const value = data[key] || "";
+          tr.cells[1].textContent = value;
+        });
+      });
+
+      select.dispatchEvent(new Event("change"));
+    })
+    .catch(err => {
+      console.error("❌ 載入班表失敗", err);
+    });
+}
+
 function registerUser() {
   const name = document.getElementById("newRealName").value.trim();
   const user = document.getElementById("newUser").value.trim();
