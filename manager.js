@@ -89,6 +89,12 @@ function registerUser() {
       if (result === "OK") {
         msg.style.color = "green";
         msg.textContent = "✅ 帳號建立成功";
+        // ✅ 清空欄位
+    document.getElementById("newRealName").value = "";
+    document.getElementById("newUser").value = "";
+    document.getElementById("newPass").value = "";
+    document.getElementById("newEmail").value = "";
+    document.getElementById("newRole").value = "staff";
         loadAllAccounts();
       } else if (result === "EXISTS") {
         msg.style.color = "red";
