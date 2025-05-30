@@ -22,7 +22,7 @@
     <table id="leaveTable">
       <thead>
         <tr>
-          <th>姓名</th><th>請假日期</th><th>假別</th><th>時段</th><th>原因</th><th>送出時間</th>
+          <th>姓名</th><th>請假日期</th><th>假別</th><th>請假時段</th><th>原因</th><th>送出時間</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -97,12 +97,50 @@
       const tabEl = document.getElementById(tab + "Tab");
       if (tabEl) tabEl.style.display = "block";
       if (tab === "account") loadAccounts();
+      if (tab === "leave") loadLeaveData();
+    }
+
+    function loadLeaveData() {
+      fetch("https://script.google.com/macros/s/AKfycbzmP06TY1DdBp8vfaHgvF72Za8f9GlGIbhWeqFmgKFYvmE1FitgTevRyFGPIgcySkui/exec")
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.querySelector("#leaveTable tbody");
+          tbody.innerHTML = "";
+          data.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${row.name || ""}</td>
+              <td>${row.date || ""}</td>
+              <td>${row.type || ""}</td>
+              <td>${row["請假時段"] || row.time || ""}</td>
+              <td>${row.reason || ""}</td>
+              <td>${new Date(row.Timestamp || row["送出時間"]).toLocaleString()}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        })
+        .catch(err => {
+          alert("❌ 請假資料讀取失敗");
+          console.error(err);
+        });
     }
 
     function logout() {
       localStorage.removeItem("username");
       localStorage.removeItem("role");
       window.location.href = "index.html";
+    }
+
+    window.onload = function () {
+      const role = localStorage.getItem("role");
+      if (role !== "manager" && role !== "admin") {
+        alert("請先登入");
+        window.location.href = "index.html";
+        return;
+      }
+      document.getElementById("logoutBtn").style.display = "block";
+      document.querySelector(".tabs").style.display = "flex";
+      switchTab("leave");
     }
   </script>
 </body>
