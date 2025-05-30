@@ -1,97 +1,53 @@
-function logout() {
-  localStorage.removeItem("username");
-  localStorage.removeItem("role");
-  window.location.href = "index.html";
-}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>主管後台 - 輕井澤</title>
+  <link rel="stylesheet" href="manager.css">
+</head>
+<body>
+  <button id="logoutBtn" onclick="logout()" style="display:none;">登出</button>
 
-function switchTab(tab) {
-  document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-  document.querySelectorAll(".tab-section").forEach(div => div.style.display = "none");
-  const tabBtn = document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`);
-  const tabContent = document.getElementById(tab + "Tab");
-  if (tabBtn) tabBtn.classList.add("active");
-  if (tabContent) tabContent.style.display = "block";
-}
+  <!-- 分頁導覽 -->
+  <div class="tabs" style="display:none;">
+    <button class="tab-btn active" onclick="switchTab('leave')">📋 請假紀錄</button>
+    <button class="tab-btn" onclick="switchTab('register')">➕ 建立帳號</button>
+    <button class="tab-btn" onclick="switchTab('schedule')">📆 排班表</button>
+  </div>
 
-function loadLeaveData() {
-  fetch("https://script.google.com/macros/s/AKfycbzmP06TY1DdBp8vfaHgvF72Za8f9GlGIbhWeqFmgKFYvmE1FitgTevRyFGPIgcySkui/exec")
-    .then(res => res.json())
-    .then(data => {
-      const tbody = document.querySelector("#leaveTable tbody");
-      if (!tbody) return;
-      tbody.innerHTML = "";
-      data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row.name || ""}</td>
-          <td>${row.date || ""}</td>
-          <td>${row.type || ""}</td>
-          <td>${row.time || ""}</td>
-          <td>${row.reason || ""}</td>
-          <td>${new Date(row["Timestamp"] || row["送出時間"]).toLocaleString()}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    })
-    .catch(err => {
-      alert("❌ 請假資料讀取失敗");
-      console.error(err);
-    });
-}
+  <!-- 請假紀錄 -->
+  <div class="tab-section" id="leaveTab">
+    <h3>📋 請假紀錄</h3>
+    <table id="leaveTable">
+      <thead>
+        <tr>
+          <th>姓名</th><th>請假日期</th><th>假別</th><th>時段</th><th>原因</th><th>送出時間</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-function registerUser() {
-  const name = document.getElementById("newRealName").value.trim();
-  const user = document.getElementById("newUser").value.trim();
-  const pass = document.getElementById("newPass").value.trim();
-  const role = document.getElementById("newRole").value;
-  const msg = document.getElementById("registerMsg");
+  <!-- 建立帳號 -->
+  <div class="tab-section" id="registerTab" style="display:none;">
+    <h3>➕ 建立帳號</h3>
+    <input type="text" id="newRealName" placeholder="真實姓名">
+    <input type="text" id="newUser" placeholder="帳號">
+    <input type="password" id="newPass" placeholder="密碼">
+    <select id="newRole">
+      <option value="staff">員工</option>
+      <option value="manager">主管</option>
+    </select>
+    <button onclick="registerUser()">建立帳號</button>
+    <p id="registerMsg" class="message"></p>
+  </div>
 
-  if (!name || !user || !pass) {
-    msg.style.color = "red";
-    msg.textContent = "❗請輸入完整資料";
-    return;
-  }
+  <!-- 排班表 -->
+  <div class="tab-section" id="scheduleTab" style="display:none;">
+    <h3>📆 排班表</h3>
+    <p>這裡可以顯示或設定每日排班資訊（內場／外場）</p>
+  </div>
 
-  fetch("https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `name=${encodeURIComponent(name)}&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&role=${role}`
-  })
-    .then(res => res.text())
-    .then(result => {
-      if (result === "OK") {
-        msg.style.color = "green";
-        msg.textContent = "✅ 帳號建立成功";
-      } else if (result === "EXISTS") {
-        msg.style.color = "red";
-        msg.textContent = "⚠️ 帳號已存在";
-      } else {
-        msg.style.color = "red";
-        msg.textContent = "❌ 建立失敗：" + result;
-      }
-    })
-    .catch(err => {
-      msg.style.color = "red";
-      msg.textContent = "❌ 網路錯誤：" + err;
-    });
-}
-
-window.onload = function () {
-  const role = localStorage.getItem("role");
-  const user = localStorage.getItem("username");
-
-  if (role === "manager" || role === "admin") {
-    const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) logoutBtn.style.display = "block";
-    switchTab("leave");
-    loadLeaveData();
-  } else {
-    alert("請先登入");
-    window.location.href = "index.html";
-  }
-
-  history.pushState(null, null, location.href);
-  window.onpopstate = function () {
-    history.go(1);
-  };
-};
+  <script src="manager.js"></script>
+</body>
+</html>
