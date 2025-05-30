@@ -16,7 +16,9 @@
           onsubmit="submitted=true;">
 
       <label>姓名</label>
-      <input type="text" name="name" id="realName" readonly>
+      <p id="displayName" style="font-weight:bold; margin-bottom: 10px;"></p>
+      <input type="hidden" name="name" id="realName">
+
 
       <label>請假日期</label>
       <input type="date" name="date" required>
