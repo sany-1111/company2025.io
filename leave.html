@@ -3,94 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>輕井澤請假表單</title>
-  <style>
-    body {
-      font-family: "微軟正黑體", sans-serif;
-      background-color: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding-top: 60px;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .form-container {
-      background: white;
-      padding: 30px 40px;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      width: 400px;
-    }
-
-    h2 {
-      text-align: center;
-      color: #2e7d32;
-    }
-
-    label {
-      margin-top: 12px;
-      display: block;
-      font-weight: bold;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      box-sizing: border-box;
-    }
-
-    .time-options {
-      margin-top: 10px;
-    }
-
-    .time-options label {
-      margin-right: 10px;
-    }
-
-    button[type="submit"] {
-      margin-top: 20px;
-      width: 100%;
-      padding: 12px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button[type="submit"]:hover {
-      background-color: #388e3c;
-    }
-
-    /* ✅ 固定登出按鈕樣式 */
-    #logoutBtn {
-      position: fixed;
-      top: 16px;
-      right: 20px;
-      padding: 8px 14px;
-      background-color: #f44336;
-      border: none;
-      border-radius: 6px;
-      color: white;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: bold;
-      z-index: 999;
-    }
-
-    #logoutBtn:hover {
-      background-color: #d32f2f;
-    }
-  </style>
+  <link rel="stylesheet" href="leave.css">
 </head>
 <body>
-
-  <!-- ✅ 固定在畫面右上角的登出按鈕 -->
   <button id="logoutBtn" onclick="logout()">登出</button>
 
   <div class="form-container">
@@ -99,7 +14,7 @@
           action="https://script.google.com/macros/s/AKfycbzmP06TY1DdBp8vfaHgvF72Za8f9GlGIbhWeqFmgKFYvmE1FitgTevRyFGPIgcySkui/exec"
           target="hidden_iframe"
           onsubmit="submitted=true;">
-      
+
       <label>姓名</label>
       <input type="text" name="name" required>
 
@@ -128,32 +43,9 @@
     </form>
   </div>
 
-  <iframe name="hidden_iframe" style="display:none;" onload="if(submitted) alert('✅ 表單已提交並儲存！');"></iframe>
+  <iframe name="hidden_iframe" style="display:none;"
+          onload="if(submitted) alert('✅ 表單已提交並儲存！');"></iframe>
 
-  <script>
-    let submitted = false;
-
-    function logout() {
-      localStorage.removeItem("username");
-      localStorage.removeItem("role");
-      window.location.href = "index.html";
-    }
-
-    window.onload = function () {
-      const user = localStorage.getItem("username");
-      const role = localStorage.getItem("role");
-
-      if (!user || role !== "staff") {
-        alert("請先登入");
-        window.location.href = "index.html";
-      }
-
-      // 防止上一頁返回
-      history.pushState(null, null, location.href);
-      window.onpopstate = function () {
-        history.go(1);
-      };
-    };
-  </script>
+  <script src="leave.js"></script>
 </body>
 </html>
