@@ -2,78 +2,48 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>主管請假資料總覽</title>
-  <style>
-    body {
-      font-family: "微軟正黑體", sans-serif;
-      background-color: #f0f0f0;
-      padding: 30px;
-    }
-    h2 {
-      text-align: center;
-      color: #2c3e50;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background-color: #fff;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 12px;
-      text-align: center;
-    }
-    th {
-      background-color: #3498db;
-      color: white;
-    }
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-  </style>
+  <title>主管後台 - 輕井澤</title>
+  <link rel="stylesheet" href="manager.css">
 </head>
 <body>
-  <h2>主管後台 - 請假紀錄總覽</h2>
-  <table id="leaveTable">
-    <thead>
-      <tr>
-        <th>姓名</th>
-        <th>請假日期</th>
-        <th>假別</th>
-        <th>時段</th>
-        <th>原因</th>
-        <th>送出時間</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- 資料將由 JavaScript 填入 -->
-    </tbody>
-  </table>
+  <button id="logoutBtn" onclick="logout()">登出</button>
 
-  <script>
-    fetch("https://script.google.com/macros/s/AKfycbzmP06TY1DdBp8vfaHgvF72Za8f9GlGIbhWeqFmgKFYvmE1FitgTevRyFGPIgcySkui/exec")
-      .then(res => res.json())
-      .then(data => {
-        const tbody = document.querySelector("#leaveTable tbody");
-        data.forEach(row => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${row.name || ""}</td>
-            <td>${row.date || ""}</td>
-            <td>${row.type || ""}</td>
-            <td>${row.time || ""}</td>
-            <td>${row.reason || ""}</td>
-            <td>${new Date(row["Timestamp"] || row["送出時間"]).toLocaleString()}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      })
-      .catch(err => {
-        alert("❌ 資料讀取失敗，請檢查 API 或工作表權限");
-        console.error(err);
-      });
-  </script>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('leave')">📋 請假紀錄</button>
+    <button class="tab-btn" onclick="switchTab('register')">➕ 建立帳號</button>
+    <button class="tab-btn" onclick="switchTab('schedule')">📆 排班表</button>
+  </div>
+
+  <div class="tab-section" id="leaveTab">
+    <h3>📋 請假紀錄</h3>
+    <table id="leaveTable">
+      <thead>
+        <tr>
+          <th>姓名</th><th>請假日期</th><th>假別</th><th>時段</th><th>原因</th><th>送出時間</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="tab-section" id="registerTab">
+    <h3>➕ 建立帳號</h3>
+    <input type="text" id="newRealName" placeholder="真實姓名">
+    <input type="text" id="newUser" placeholder="帳號">
+    <input type="password" id="newPass" placeholder="密碼">
+    <select id="newRole">
+      <option value="staff">員工</option>
+      <option value="manager">主管</option>
+    </select>
+    <button onclick="registerUser()">建立帳號</button>
+    <p id="registerMsg" class="message"></p>
+  </div>
+
+  <div class="tab-section" id="scheduleTab">
+    <h3>📆 排班表</h3>
+    <p>這裡可以顯示或設定每日排班資訊（內場／外場）</p>
+  </div>
+
+  <script src="manager.js"></script>
 </body>
 </html>
