@@ -18,12 +18,11 @@ window.onload = function () {
     return;
   }
 
-  // 自動填入「真實姓名」欄位
-  const nameInput = document.getElementById("realName");
-  if (nameInput && name) {
-    nameInput.value = name;
-    nameInput.readOnly = true;
-  }
+    // 顯示姓名文字
+  document.getElementById("displayName").textContent = name || "";
+
+  // 放入隱藏欄位供送出用
+  document.getElementById("realName").value = name || "";
 
   // 防止上一頁返回
   history.pushState(null, null, location.href);
