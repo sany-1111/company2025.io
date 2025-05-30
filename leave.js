@@ -3,7 +3,7 @@ let submitted = false;
 function logout() {
   localStorage.removeItem("username");
   localStorage.removeItem("role");
-  localStorage.removeItem("realname");
+  localStorage.removeItem("name");
   window.location.href = "index.html";
 }
 
