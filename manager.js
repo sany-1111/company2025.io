@@ -68,10 +68,11 @@ function registerUser() {
   const name = document.getElementById("newRealName").value.trim();
   const user = document.getElementById("newUser").value.trim();
   const pass = document.getElementById("newPass").value.trim();
+  const email = document.getElementById("newEmail").value.trim(); // ✅ 新增這行
   const role = document.getElementById("newRole").value;
   const msg = document.getElementById("registerMsg");
 
-  if (!name || !user || !pass) {
+  if (!name || !user || !pass || !email) { // ✅ 加上 email 驗證
     msg.style.color = "red";
     msg.textContent = "❗請輸入完整資料";
     return;
@@ -80,7 +81,8 @@ function registerUser() {
   fetch("https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `name=${encodeURIComponent(name)}&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&role=${role}`
+    body: `action=register&name=${encodeURIComponent(name)}&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&email=${encodeURIComponent(email)}&role=${role}`
+    // ✅ 加上 action=register 與 email 參數
   })
     .then(res => res.text())
     .then(result => {
@@ -101,6 +103,7 @@ function registerUser() {
       msg.textContent = "❌ 網路錯誤：" + err;
     });
 }
+
 
 window.onload = function () {
   const role = localStorage.getItem("role");
