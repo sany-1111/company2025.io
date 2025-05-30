@@ -59,7 +59,6 @@
           <th>帳號</th>
           <th>密碼</th>
           <th>角色</th>
-          
         </tr>
       </thead>
       <tbody></tbody>
@@ -77,10 +76,10 @@
           data.forEach(row => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
+              <td>${row.name || ""}</td>
               <td>${row.username || ""}</td>
               <td>${row.password || ""}</td>
               <td>${row.role || ""}</td>
-              <td>${row.name || ""}</td>
             `;
             tbody.appendChild(tr);
           });
@@ -98,6 +97,12 @@
       const tabEl = document.getElementById(tab + "Tab");
       if (tabEl) tabEl.style.display = "block";
       if (tab === "account") loadAccounts();
+    }
+
+    function logout() {
+      localStorage.removeItem("username");
+      localStorage.removeItem("role");
+      window.location.href = "index.html";
     }
   </script>
 </body>
