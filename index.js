@@ -16,7 +16,7 @@ function login() {
         if (result.role) {
           localStorage.setItem("username", user);
           localStorage.setItem("role", result.role);
-          localStorage.setItem("name", result.name || ""); // ✅ 儲存真實姓名
+          localStorage.setItem("realname", result.realname || ""); // ✅ 儲存真實姓名
           if (result.role === "staff") {
             window.location.href = "leave.html";
           } else {
