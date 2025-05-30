@@ -49,10 +49,11 @@ function loadAllAccounts() {
       data.forEach(row => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${row.name || ""}</td>
+          
           <td>${row.username || ""}</td>
           <td>${row.password || ""}</td>
           <td>${row.role || ""}</td>
+          <td>${row.name || ""}</td>
         `;
         tbody.appendChild(tr);
       });
