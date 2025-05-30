@@ -35,7 +35,7 @@
     <input type="text" id="newRealName" placeholder="真實姓名">
     <input type="text" id="newUser" placeholder="帳號">
     <input type="password" id="newPass" placeholder="密碼">
-    <input type="email" id="newEmail" placeholder="Email 信箱">  <!-- ✅ 加上這一行 -->
+    <input type="email" id="newEmail" placeholder="Email 信箱">
     <select id="newRole">
       <option value="staff">員工</option>
       <option value="manager">主管</option>
@@ -46,8 +46,16 @@
 
   <!-- 📆 排班表 -->
   <div class="tab-section" id="scheduleTab" style="display:none;">
-    <h3>📆 排班表</h3>
-    <p>這裡可以顯示或設定每日排班資訊（內場／外場）</p>
+    <h3>📆 排班表（選擇日期）</h3>
+    <label for="daySelect">選擇日期：</label>
+    <select id="daySelect" onchange="showScheduleForDay()"></select>
+
+    <table id="scheduleTable" style="margin-top: 20px; width: 100%;">
+      <thead>
+        <tr><th>時段</th><th>上班人員</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
 
   <!-- 📖 所有帳號 -->
@@ -68,6 +76,46 @@
 
   <script src="manager.js"></script>
   <script>
+    let scheduleData = [];
+
+    function loadScheduleData() {
+      fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec")
+        .then(res => res.json())
+        .then(data => {
+          scheduleData = data;
+          populateDayOptions();
+          showScheduleForDay();
+        });
+    }
+
+    function populateDayOptions() {
+      const select = document.getElementById("daySelect");
+      select.innerHTML = "";
+
+      const days = scheduleData[0].slice(1);
+      days.forEach((day, index) => {
+        const option = document.createElement("option");
+        option.value = index + 1;
+        option.textContent = day || `${index + 1}日`;
+        select.appendChild(option);
+      });
+    }
+
+    function showScheduleForDay() {
+      const dayIndex = parseInt(document.getElementById("daySelect").value);
+      const tbody = document.querySelector("#scheduleTable tbody");
+      tbody.innerHTML = "";
+
+      for (let i = 1; i < scheduleData.length; i++) {
+        const row = scheduleData[i];
+        const time = row[0];
+        const people = row[dayIndex];
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${time}</td><td>${people || ""}</td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
     function loadAccounts() {
       fetch("https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec?action=read")
         .then(res => res.json())
@@ -99,6 +147,7 @@
       if (tabEl) tabEl.style.display = "block";
       if (tab === "account") loadAccounts();
       if (tab === "leave") loadLeaveData();
+      if (tab === "schedule") loadScheduleData();
     }
 
     function loadLeaveData() {
