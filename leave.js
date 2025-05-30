@@ -9,7 +9,7 @@ function logout() {
 
 window.onload = function () {
   const role = localStorage.getItem("role");
-  const name = localStorage.getItem("realname");
+  const name = localStorage.getItem("name");
 
   // 檢查登入身分
   if (!role || role !== "staff") {
