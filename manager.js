@@ -11,6 +11,9 @@ function switchTab(tab) {
   const tabContent = document.getElementById(tab + "Tab");
   if (tabBtn) tabBtn.classList.add("active");
   if (tabContent) tabContent.style.display = "block";
+  if (tab === "account") loadAllAccounts();
+  if (tab === "leave") loadLeaveData();
+  if (tab === "schedule") loadScheduleData();
 }
 
 function loadLeaveData() {
@@ -49,7 +52,6 @@ function loadAllAccounts() {
       data.forEach(row => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          
           <td>${row.username || ""}</td>
           <td>${row.password || ""}</td>
           <td>${row.role || ""}</td>
@@ -68,11 +70,11 @@ function registerUser() {
   const name = document.getElementById("newRealName").value.trim();
   const user = document.getElementById("newUser").value.trim();
   const pass = document.getElementById("newPass").value.trim();
-  const email = document.getElementById("newEmail").value.trim(); // ✅ 新增這行
+  const email = document.getElementById("newEmail").value.trim();
   const role = document.getElementById("newRole").value;
   const msg = document.getElementById("registerMsg");
 
-  if (!name || !user || !pass || !email) { // ✅ 加上 email 驗證
+  if (!name || !user || !pass || !email) {
     msg.style.color = "red";
     msg.textContent = "❗請輸入完整資料";
     return;
@@ -82,19 +84,17 @@ function registerUser() {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: `action=register&name=${encodeURIComponent(name)}&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&email=${encodeURIComponent(email)}&role=${role}`
-    // ✅ 加上 action=register 與 email 參數
   })
     .then(res => res.text())
     .then(result => {
       if (result === "OK") {
         msg.style.color = "green";
         msg.textContent = "✅ 帳號建立成功";
-        // ✅ 清空欄位
-    document.getElementById("newRealName").value = "";
-    document.getElementById("newUser").value = "";
-    document.getElementById("newPass").value = "";
-    document.getElementById("newEmail").value = "";
-    document.getElementById("newRole").value = "staff";
+        document.getElementById("newRealName").value = "";
+        document.getElementById("newUser").value = "";
+        document.getElementById("newPass").value = "";
+        document.getElementById("newEmail").value = "";
+        document.getElementById("newRole").value = "staff";
         loadAllAccounts();
       } else if (result === "EXISTS") {
         msg.style.color = "red";
@@ -110,7 +110,6 @@ function registerUser() {
     });
 }
 
-
 window.onload = function () {
   const role = localStorage.getItem("role");
   const user = localStorage.getItem("username");
@@ -123,8 +122,6 @@ window.onload = function () {
     if (tabContainer) tabContainer.style.display = "flex";
 
     switchTab("leave");
-    loadLeaveData();
-    loadAllAccounts();
   } else {
     alert("請先登入");
     window.location.href = "index.html";
