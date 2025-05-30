@@ -21,3 +21,4 @@ function login() {
     .catch(err => {
       error.textContent = "❌ 登入失敗：" + err;
     });
+} // 👈 這行是你漏掉的結尾大括號！
