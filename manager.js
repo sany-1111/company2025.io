@@ -39,6 +39,30 @@ function loadLeaveData() {
     });
 }
 
+function loadAllAccounts() {
+  fetch("https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec?action=read")
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.querySelector("#accountTable tbody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.name || ""}</td>
+          <td>${row.username || ""}</td>
+          <td>${row.password || ""}</td>
+          <td>${row.role || ""}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(err => {
+      alert("❌ 帳號資料讀取失敗");
+      console.error(err);
+    });
+}
+
 function registerUser() {
   const name = document.getElementById("newRealName").value.trim();
   const user = document.getElementById("newUser").value.trim();
@@ -62,6 +86,7 @@ function registerUser() {
       if (result === "OK") {
         msg.style.color = "green";
         msg.textContent = "✅ 帳號建立成功";
+        loadAllAccounts();
       } else if (result === "EXISTS") {
         msg.style.color = "red";
         msg.textContent = "⚠️ 帳號已存在";
@@ -89,6 +114,7 @@ window.onload = function () {
 
     switchTab("leave");
     loadLeaveData();
+    loadAllAccounts();
   } else {
     alert("請先登入");
     window.location.href = "index.html";
