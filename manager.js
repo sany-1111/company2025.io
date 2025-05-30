@@ -78,10 +78,15 @@ window.onload = function () {
   const user = localStorage.getItem("username");
 
   if (role === "manager" || role === "admin") {
-    document.getElementById("logoutBtn").style.display = "block";
-    document.getElementById("tabs").style.display = "flex";
-    switchTab("leave");
-    loadLeaveData();
+    const tabs = document.getElementById("tabs");
+    if (tabs) {
+      document.getElementById("logoutBtn").style.display = "block";
+      tabs.style.display = "flex";
+      switchTab("leave");
+      loadLeaveData();
+    } else {
+      console.error("❌ 找不到 #tabs 元素");
+    }
   } else {
     alert("請先登入");
     window.location.href = "index.html";
