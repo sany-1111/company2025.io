@@ -129,7 +129,7 @@ function registerUser() {
   const role = document.getElementById("newRole").value;
   const msg = document.getElementById("registerMsg");
 
-  // ✅ 新增：讀取多選的值勤單位欄位
+  // ✅ 讀取「值勤單位」選項
   const positionSelect = document.getElementById("newPosition");
   const selectedPositions = Array.from(positionSelect.selectedOptions)
     .map(opt => opt.value)
@@ -141,6 +141,7 @@ function registerUser() {
     return;
   }
 
+  // ✅ 將 position 加入 POST 資料中
   fetch("https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -151,16 +152,13 @@ function registerUser() {
       if (result === "OK") {
         msg.style.color = "green";
         msg.textContent = "✅ 帳號建立成功";
-
-        // ✅ 清空欄位
         document.getElementById("newRealName").value = "";
         document.getElementById("newUser").value = "";
         document.getElementById("newPass").value = "";
         document.getElementById("newEmail").value = "";
         document.getElementById("newRole").value = "staff";
         document.getElementById("newPosition").selectedIndex = -1;
-
-        loadAllAccounts();
+        loadAccounts(); // 更新顯示
       } else if (result === "EXISTS") {
         msg.style.color = "red";
         msg.textContent = "⚠️ 帳號已存在";
@@ -174,6 +172,7 @@ function registerUser() {
       msg.textContent = "❌ 網路錯誤：" + err;
     });
 }
+
 
 
 window.onload = function () {
