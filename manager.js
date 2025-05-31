@@ -129,7 +129,13 @@ function registerUser() {
   const role = document.getElementById("newRole").value;
   const msg = document.getElementById("registerMsg");
 
-  if (!name || !user || !pass || !email) {
+  // ✅ 新增：讀取多選的值勤單位欄位
+  const positionSelect = document.getElementById("newPosition");
+  const selectedPositions = Array.from(positionSelect.selectedOptions)
+    .map(opt => opt.value)
+    .join(",");
+
+  if (!name || !user || !pass || !email || !selectedPositions) {
     msg.style.color = "red";
     msg.textContent = "❗請輸入完整資料";
     return;
@@ -138,18 +144,22 @@ function registerUser() {
   fetch("https://script.google.com/macros/s/AKfycbwzx3Xw3AG5nlirhS89yVM9gb-6vMAI8KyI9BznZDaWKEvi71epGMvDD7YQDgu4I_bx/exec", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `action=register&name=${encodeURIComponent(name)}&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&email=${encodeURIComponent(email)}&role=${role}`
+    body: `action=register&name=${encodeURIComponent(name)}&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}&email=${encodeURIComponent(email)}&role=${encodeURIComponent(role)}&position=${encodeURIComponent(selectedPositions)}`
   })
     .then(res => res.text())
     .then(result => {
       if (result === "OK") {
         msg.style.color = "green";
         msg.textContent = "✅ 帳號建立成功";
+
+        // ✅ 清空欄位
         document.getElementById("newRealName").value = "";
         document.getElementById("newUser").value = "";
         document.getElementById("newPass").value = "";
         document.getElementById("newEmail").value = "";
         document.getElementById("newRole").value = "staff";
+        document.getElementById("newPosition").selectedIndex = -1;
+
         loadAllAccounts();
       } else if (result === "EXISTS") {
         msg.style.color = "red";
@@ -164,6 +174,7 @@ function registerUser() {
       msg.textContent = "❌ 網路錯誤：" + err;
     });
 }
+
 
 window.onload = function () {
   const role = localStorage.getItem("role");
